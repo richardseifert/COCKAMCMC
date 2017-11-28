@@ -1,5 +1,5 @@
-# PyCAMCMC
+# PyFAM
 
-**Py**thon **C**ustomizable **A**daptive **M**arkov **C**hain **M**onte **C**arlo. Pronounced like "Cockamamy". 
+**Py**thon **F**reeform **A**daptive **M**CMC
 
 A generalized, customizable implementation of a Markov Chain Monte Carlo algorithm for fitting functions of many variables in Python.
