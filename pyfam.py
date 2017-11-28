@@ -138,17 +138,47 @@ class MCMC:
         for i,w in enumerate(self.walkers):
             w.plot_accepted(run_id, axes=axes, label="Walker #"+str(i+1))
 
-    def plot_fit(self):
-        fig, ax = plt.subplots()
-        ax.scatter(self.x, self.y, color='blue')
-        ax.plot(self.x, self.model(self.x, self.p), color='red')
+    def corner_plot(self, run_id):
+        fig = plt.figure()
+        p_accepted = self.get_p_accepted(run_id)[:,1:]
+        nparams = p_accepted.shape[1]
+
+        diag_axes = []
+        for p in range(nparams):
+            ax = fig.add_subplot(nparams, nparams, 1 + p*(nparams+1))
+            ax.get_xaxis().set_visible(False)
+            ax.get_yaxis().set_visible(False)
+
+            bins, edges = np.histogram(p_accepted[:,p], 30)
+            xlow, xhigh = edges[:-1],edges[1:]
+            x = np.array([xlow, xhigh]).T.flatten()
+            y = np.array([bins,bins]).T.flatten()
+            ax.plot(x, y, color="blue", lw=1)
+
+            diag_axes.append(ax)
+
+        ax_sharey = {}
+        for p1 in range(nparams):
+            for p2 in range(p1+1, nparams):
+                if not p2 in ax_sharey:
+                    ax = fig.add_subplot(nparams, nparams, 1 + p1 + p2*nparams, sharex=diag_axes[p1])
+                    ax_sharey[p2] = ax
+                else:
+                    ax = fig.add_subplot(nparams, nparams, 1 + p1 + p2*nparams, sharex=diag_axes[p1], sharey=ax_sharey[p2])
+
+                if p2 != nparams-1:
+                    ax.get_xaxis().set_visible(False)
+                if p1 != 0:
+                    ax.get_yaxis().set_visible(False)
+                ax.scatter(p_accepted[:,p1], p_accepted[:,p2], s=1, color='blue', alpha=0.1)
 
     def plot_sample(self, run_id, n):
         fig, ax = plt.subplots()
         p_accepted = self.get_p_accepted(run_id)[:,1:]
+        x = np.linspace(min(self.x), max(self.x), 1000)
         for i in np.random.choice(len(p_accepted), n):
-            ax.plot(self.x, self.model(self.x, p_accepted[i]))
-        ax.scatter(self.x, self.y)
+            ax.plot(x, self.model(x, p_accepted[i]), color="blue", alpha=1./n**0.65, zorder=0)
+        ax.scatter(self.x, self.y, color="black")
 
     def load_walker_history(self, path):
         '''

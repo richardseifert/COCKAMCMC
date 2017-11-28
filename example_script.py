@@ -1,8 +1,7 @@
-from mcmc import MCMC
+from pycamcmc import MCMC
 
 import numpy as np
 import matplotlib.pyplot as plt
-plt.ion()
 
 #Define a model function to use when fitting data.
 #  For this example, that's a gaussian function plus a linear offset.
@@ -21,8 +20,23 @@ x += np.random.normal(0, .05, npoints)
 fig, ax = plt.subplots()
 ax.scatter(x, y)
 
+#Create MCMC instance.
 mcmc = MCMC(x, y, model=f)
+
+#Add one walker.
 mcmc.add_walkers(1, p0=[1., 1., 1., 1., 1.]) #Starting guess is [1.0, 1.0, 1.0, 1.0, 1.0]
-mcmc.walk(200, run_id="burn")
+
+#Burn in for 200 steps.
+print "Burn in"
+mcmc.walk(400, run_id="burn")
+
+#Add four additional walkers.
 mcmc.add_walkers(4)
-mcmc.walk(1000, run_id="walk")
+
+#Walk each walker for 1000 steps.
+print "Walking"
+mcmc.walk(2000, run_id="walk")
+
+mcmc.plot_sample("walk", 50)
+
+plt.show()
