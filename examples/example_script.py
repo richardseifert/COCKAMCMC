@@ -1,4 +1,4 @@
-from pycamcmc import MCMC
+from pyfam import MCMC
 
 import numpy as np
 import matplotlib.pyplot as plt
