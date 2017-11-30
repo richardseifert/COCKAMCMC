@@ -18,20 +18,20 @@ def linlogspace(xmin,xmax,n):
     return np.logspace(np.log10(xmin),np.log10(xmax),n)
 
 #here's the contour actual values
-def adaptive_param_plot(x, y,
-                        bins=10,
-                        threshold=5,
-                        marker='.',
-                        marker_color=None,
-                        ncontours=5,
-                        fill=False,
-                        mesh=False,
-                        contourspacing=linlogspace,
-                        mesh_alpha=0.5,
-                        norm=None,
-                        axis=None,
-                        cmap=None,
-                        **kwargs):
+def contour(x, y,
+            bins=10,
+            threshold=5,
+            marker='.',
+            marker_color=None,
+            ncontours=5,
+            fill=False,
+            mesh=False,
+            contourspacing=linlogspace,
+            mesh_alpha=0.5,
+            norm=None,
+            axis=None,
+            cmap=None,
+            **kwargs):
     if axis is None:
         axis = plt.gca()
 
@@ -84,13 +84,13 @@ def adaptive_param_plot(x, y,
     return c_x, c_y, H, x[ok][toplot], y[ok][toplot]
 
 
-N = 5000000
-x = np.random.normal(0, 1, N)
-y = x+np.random.normal(0, 1, N)
+if __name__ == "__main__":
+    N = 5000000
+    x = np.random.normal(0, 1, N)
+    y = x+np.random.normal(0, 1, N)
 
 
-fig, ax = plt.subplots()
-#ax.scatter(x, y)
+    fig, ax = plt.subplots()
+    #ax.scatter(x, y)
 
-adaptive_param_plot(x, y, bins = 100, fill = True, ncontours = 7, threshold = 50, axis = ax)
-
+    contour(x, y, bins = 100, fill = True, ncontours = 7, threshold = 50, axis = ax)

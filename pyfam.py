@@ -6,6 +6,7 @@ plt.ion()
 import glob
 
 from libs.walker import walker
+from libs.contour import contour
 
 class MCMC:
     def __init__(self, x, y, model, savepath=None, cost=None, pnames=None):
@@ -135,10 +136,12 @@ class MCMC:
         for i,w in enumerate(self.walkers):
             w.plot_accepted(run_id, axes=axes, label="Walker #"+str(i+1))
 
-    def corner(self, run_id):
+    def corner(self, run_id, cmap="Greys"):
         fig = plt.figure()
         p_accepted = self.get_p_accepted(run_id)[:,1:]
         nparams = p_accepted.shape[1]
+
+        # Draw diagonal histograms
 
         diag_axes = []
         for p in range(nparams):
@@ -150,9 +153,17 @@ class MCMC:
             xlow, xhigh = edges[:-1],edges[1:]
             x = np.array([xlow, xhigh]).T.flatten()
             y = np.array([bins,bins]).T.flatten()
-            ax.plot(x, y, color="blue", lw=1)
+            ax.plot(x, y, color="black", lw=1)
 
             diag_axes.append(ax)
+
+
+        # Draw 2-parameter contours
+
+        #Choose 500 random points to plot as a scatter plot over the contours.
+        p_scat = p_accepted[np.random.choice(len(p_accepted), min([len(p_accepted),20]), replace=False)]
+
+        labels = ["Q"+str(i+1) for i in range(nparams)]
 
         ax_sharey = {}
         for p1 in range(nparams):
@@ -165,9 +176,14 @@ class MCMC:
 
                 if p2 != nparams-1:
                     ax.get_xaxis().set_visible(False)
+                else:
+                    ax.set_xlabel(labels[p1])
                 if p1 != 0:
                     ax.get_yaxis().set_visible(False)
-                ax.scatter(p_accepted[:,p1], p_accepted[:,p2], s=1, color='blue', alpha=0.1)
+                else:
+                    ax.set_ylabel(labels[p2])
+                contour(p_accepted[:,p1], p_accepted[:,p2], bins=15, ncontours=7, cmap=cmap, threshold=3, axis=ax, fill=True) 
+                ax.scatter(p_scat[:,p1], p_scat[:,p2], s=1, color='black', alpha=0.2)
 
         #Decrease spacing between axes.
         plt.subplots_adjust(wspace=0.05, hspace=0.06)
