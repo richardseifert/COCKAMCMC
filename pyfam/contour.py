@@ -1,9 +1,3 @@
-#-*- coding: utf-8 -*-
-"""
-Created on Sun May 01 20:28:46 2016
-
-@author: Anna
-"""
 import numpy as np
 import matplotlib.pyplot as plt
 plt.ion()

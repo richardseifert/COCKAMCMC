@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 plt.ion()
 import glob
 
-from libs.walker import walker
-from libs.contour import contour
+from walker import walker
+from contour import contour
 
 class MCMC:
     def __init__(self, x, y, model, savepath=None, cost=None, pnames=None):
@@ -66,6 +66,17 @@ class MCMC:
 
         for i in range(n):
             self.walkers.append(walker(self.x, self.y, self.model, p0, psig, self.cost))
+
+    def get_best_params(self, run_id, method="mean"):
+        if method=="mean":
+            return np.mean(self.get_p_accepted(run_id)[:,1:], axis=0)
+        if method=="best":
+            p = self.get_p_accepted(run_id)
+            rsqrd = p[:,0]
+            p_accepted = p[:,1:]
+            return p_accepted[np.argmin(rsqrd)]
+        
+
 
     def move_to_best_walker(self, **kwargs):
         best = np.array([w.get_best_p(**kwargs) for w in self.walkers])
@@ -136,13 +147,30 @@ class MCMC:
         for i,w in enumerate(self.walkers):
             w.plot_accepted(run_id, axes=axes, label="Walker #"+str(i+1))
 
-    def corner(self, run_id, cmap="Greys"):
+    def corner(self, run_id, p_crosshair=None, **kwargs):
+        #Update parameters for creating contour plots.
+        contour_kwargs = {
+                'bins':35,
+                'threshold':2,
+                'marker_color':None,
+                'ncontours':5,
+                'fill':True,
+                'mesh':False,
+                'mesh_alpha':0.5,
+                'cmap':None}
+        contour_kwargs.update(kwargs)
+
+        #Determine points to draw crosshair at.
+        if type(p_crosshair) == str:
+            method = p_crosshair
+            p_crosshair = self.get_best_params(run_id, method=method)
+        
+        #Create figure
         fig = plt.figure()
         p_accepted = self.get_p_accepted(run_id)[:,1:]
         nparams = p_accepted.shape[1]
 
         # Draw diagonal histograms
-
         diag_axes = []
         for p in range(nparams):
             ax = fig.add_subplot(nparams, nparams, 1 + p*(nparams+1))
@@ -154,14 +182,15 @@ class MCMC:
             x = np.array([xlow, xhigh]).T.flatten()
             y = np.array([bins,bins]).T.flatten()
             ax.plot(x, y, color="black", lw=1)
+            if type(p_crosshair) != type(None):
+                ax.axvline(x=p_crosshair[p], color="black", lw=1)
 
             diag_axes.append(ax)
 
 
         # Draw 2-parameter contours
-
-        #Choose 500 random points to plot as a scatter plot over the contours.
-        p_scat = p_accepted[np.random.choice(len(p_accepted), min([len(p_accepted),20]), replace=False)]
+        #Choose 200 random points to plot as a scatter plot over the contours.
+        p_scat = p_accepted[np.random.choice(len(p_accepted), min([len(p_accepted),200]), replace=False)]
 
         labels = ["Q"+str(i+1) for i in range(nparams)]
 
@@ -182,8 +211,12 @@ class MCMC:
                     ax.get_yaxis().set_visible(False)
                 else:
                     ax.set_ylabel(labels[p2])
-                contour(p_accepted[:,p1], p_accepted[:,p2], bins=15, ncontours=7, cmap=cmap, threshold=3, axis=ax, fill=True) 
+                contour(p_accepted[:,p1], p_accepted[:,p2], axis=ax, **contour_kwargs) 
                 ax.scatter(p_scat[:,p1], p_scat[:,p2], s=1, color='black', alpha=0.2)
+                if type(p_crosshair) != type(None):
+                    ax.scatter(p_crosshair[p1], p_crosshair[p2], color="black", s=3)
+                    ax.axvline(x=p_crosshair[p1], color="black", lw=1)
+                    ax.axhline(y=p_crosshair[p2], color="black", lw=1)
 
         #Decrease spacing between axes.
         plt.subplots_adjust(wspace=0.05, hspace=0.06)
