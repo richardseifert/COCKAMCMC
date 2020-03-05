@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-plt.ion()
 
 #adding in the contour script
 def multidigitize(x, y, bins_x,bins_y):

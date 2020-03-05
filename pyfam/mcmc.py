@@ -1,12 +1,12 @@
 import numpy as np
 from itertools import combinations
-from scipy.misc import comb
+from scipy.special import comb
 import matplotlib.pyplot as plt
-plt.ion()
+
 import glob
 
-from walker import walker
-from contour import contour
+from .walker import walker
+from .contour import contour
 
 class MCMC:
     def __init__(self, x, y, model, savepath=None, cost=None, pnames=None):

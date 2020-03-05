@@ -1,4 +1,4 @@
-from pyfam import MCMC
+from pyfam.mcmc import MCMC
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -41,3 +41,4 @@ mcmc.plot_sample(run_id="walk", n=50)
 mcmc.corner(run_id="walk", bins=35, threshold=2, fill=True, p_crosshair="best")
 
 plt.show()
+print("WAAAAAA")
