@@ -123,8 +123,6 @@ class MCMC:
     def check_convergence(self, tol):
         walker_means = np.vstack([w.get_mean() for w in self.walkers])
         mean = np.mean(walker_means, axis=0)
-        #print np.max(np.abs(walker_means - mean), axis=0)
-        #print mean, np.std(walker_means, axis=0)
         return np.all( np.abs(walker_means - mean) < tol )
 
     def walk(self, nsteps, wi='all', run_id=None, save=True):#tol, min_nsteps=1000, max_nsteps=2000):

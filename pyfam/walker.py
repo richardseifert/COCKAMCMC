@@ -77,7 +77,6 @@ class walker:
                 self.move_to_p(p_prospective, c_prosp)
                 self.accept_sample[i].append(1) # 1 for accepted steps
             else:
-                #print "REJECTED"
                 # New paramter was rejected
                 self.accept_sample[i].append(0) # 0 for rejected steps
                 accrej_arr.append(0)

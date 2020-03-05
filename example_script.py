@@ -24,17 +24,17 @@ mcmc = MCMC(x, y, model=f)
 mcmc.add_walkers(1, p0=[1., 1., 1., 1., 1.]) #Starting guess is [1.0, 1.0, 1.0, 1.0, 1.0]
 
 #Burn in for 200 steps.
-print "Burn in"
+print("Burn in")
 mcmc.walk(200, run_id="burn")
 
 #Add four additional walkers.
 mcmc.add_walkers(4)
 
 #Walk each walker for 1000 steps.
-print "Walking"
+print("Walking")
 mcmc.walk(5000, run_id="walk")
 
-#Plot a 50 randomly drawn accepted fits.
+#Plot 50 randomly drawn accepted fits.
 mcmc.plot_sample(run_id="walk", n=50)
 
 #Plot a corner plot, showing the posterior distribution of parameters.
